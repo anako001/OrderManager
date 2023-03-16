@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OrderManager.Core;
 using OrderManager.Data;
 using OrderManager.Models;
 using System.Linq;
@@ -10,26 +11,26 @@ namespace OrderManager.Controllers
     [Route("[controller]")]
     public class OrdersController : ControllerBase
     {
-        private readonly ApiDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public OrdersController(ApiDbContext context)
+        public OrdersController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         [Route("Get")]
         public async Task<IActionResult> GetOrders()
         {
-            return Ok(await _context.Orders.ToListAsync());
+            return Ok(await _unitOfWork.Orders.All());
         }
 
         [HttpPost]
         [Route("Create")]
         public  async Task<IActionResult> CreateOrder(Order order)
         {
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
+            _unitOfWork.Orders.Add(order);
+            await _unitOfWork.CompleteAsync();
             return Ok();
         }
 
@@ -37,11 +38,12 @@ namespace OrderManager.Controllers
         [Route("Delete")]
         public async Task<IActionResult> DeleteOrder(Guid id)
         {
-            var order = await _context.Orders.FirstOrDefaultAsync(x => x.Id.Equals(id));
+            var order = await _unitOfWork.Orders.GetById(id);
             if (order == null) return NotFound();
             
-            _context.Orders.Remove(order);
-            await _context.SaveChangesAsync();
+            await  _unitOfWork.Orders.Delete(order);
+            await _unitOfWork.CompleteAsync();
+
             return NoContent();
         }
 
@@ -49,17 +51,33 @@ namespace OrderManager.Controllers
         [Route("Update")]
         public async Task<IActionResult> UpdateOrder(Order order)
         {
-            var existingOrder = await _context.Orders.FirstOrDefaultAsync(x => x.Id == order.Id);
+            var existingOrder = await _unitOfWork.Orders.GetById(order.Id);
             if (existingOrder == null) return NotFound();
-
-            existingOrder.CustomerName = order.CustomerName;
-            existingOrder.Type = order.Type;
-            existingOrder.CreatedDate = order.CreatedDate;
-            existingOrder.CreatedByUsername = order.CreatedByUsername;
-
-            await _context.SaveChangesAsync();
+            await _unitOfWork.Orders.Update(existingOrder);
+            await _unitOfWork.CompleteAsync();
 
             return NoContent();
+        }
+
+        [HttpGet]
+        [Route("OrderType")]
+        public async Task<IActionResult> GetOrderByType(string type)
+        {
+            if (string.IsNullOrEmpty(type)) throw new ArgumentNullException("The vlaue passed cannot be null or empty");
+
+            var isStandardOrder = type.ToLower() == OrderType.Standard.ToString().ToLower();
+            var isSaleOrder = type.ToLower() == OrderType.SaleOrder.ToString().ToLower();
+            var isPurchaseOrder = type.ToLower() == OrderType.PurchaseOrder.ToString().ToLower();
+            var isTransferOrder = type.ToLower() == OrderType.TransferOrder.ToString().ToLower();
+            var isReturnOrder = type.ToLower() == OrderType.ReturnOrder.ToString().ToLower();
+
+            var orderTypeFound = isStandardOrder || isSaleOrder || isPurchaseOrder || isTransferOrder || isReturnOrder;
+
+            if (!orderTypeFound) throw new ArgumentException("The Value passed cannot be found");
+
+            var orders = await _unitOfWork.Orders.GetByOrderType(type);
+            if (orders == null) return NotFound();
+            return Ok(orders);
         }
 
     }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using OrderManager.Core;
 using OrderManager.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApiDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var app = builder.Build();
 
