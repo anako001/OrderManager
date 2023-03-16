@@ -53,10 +53,10 @@ namespace OrderManager.Controllers
         {
             var existingOrder = await _unitOfWork.Orders.GetById(order.Id);
             if (existingOrder == null) return NotFound();
-            await _unitOfWork.Orders.Update(existingOrder);
+            await _unitOfWork.Orders.Update(order);
             await _unitOfWork.CompleteAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         [HttpGet]
