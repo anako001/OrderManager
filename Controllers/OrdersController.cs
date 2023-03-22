@@ -8,7 +8,7 @@ using System.Linq;
 namespace OrderManager.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/orders")]
     public class OrdersController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -19,14 +19,14 @@ namespace OrderManager.Controllers
         }
 
         [HttpGet]
-        [Route("Get")]
+        [Route("get")]
         public async Task<IActionResult> GetOrders()
         {
             return Ok(await _unitOfWork.Orders.All());
         }
 
         [HttpPost]
-        [Route("Create")]
+        [Route("create")]
         public  async Task<IActionResult> CreateOrder(Order order)
         {
             _unitOfWork.Orders.Add(order);
@@ -35,7 +35,7 @@ namespace OrderManager.Controllers
         }
 
         [HttpDelete]
-        [Route("Delete")]
+        [Route("delete")]
         public async Task<IActionResult> DeleteOrder(Guid id)
         {
             var order = await _unitOfWork.Orders.GetById(id);
@@ -48,7 +48,7 @@ namespace OrderManager.Controllers
         }
 
         [HttpPatch]
-        [Route("Update")]
+        [Route("update")]
         public async Task<IActionResult> UpdateOrder(Order order)
         {
             var existingOrder = await _unitOfWork.Orders.GetById(order.Id);

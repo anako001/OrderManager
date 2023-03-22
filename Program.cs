@@ -12,10 +12,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<ApiDbContext>(options =>
+builder.Services.AddDbContextPool<ApiDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDataBase")));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddCors();
 
 var app = builder.Build();
 
@@ -26,11 +27,10 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:5264"));
 
 app.UseHttpsRedirection();
 
