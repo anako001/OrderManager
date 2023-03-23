@@ -2,8 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using OrderManager.Core;
 using OrderManager.Data;
 using OrderManager.Models;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
 
 // Add services to the container.
 

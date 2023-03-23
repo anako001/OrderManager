@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "iisSettings": {
     "windowsAuthentication": false,
@@ -16,7 +16,9 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5285",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://ordermanagervault.vault.azure.net/",
+        "AZURE_USERNAME": "kanako001@outlook.com"
       }
     },
     "https": {
@@ -24,9 +26,11 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7055;http://localhost:5285;https://order-manager-dotnet.herokuapp.com",
+      "applicationUrl": "https://localhost:7055;http://localhost:5285;https://ordermanager20230323144405.azurewebsites.net",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://ordermanagervault.vault.azure.net/",
+        "AZURE_USERNAME": "kanako001@outlook.com"
       }
     },
     "IIS Express": {
@@ -34,7 +38,9 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://ordermanagervault.vault.azure.net/",
+        "AZURE_USERNAME": "kanako001@outlook.com"
       }
     }
   }
