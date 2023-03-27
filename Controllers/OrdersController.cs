@@ -4,6 +4,7 @@ using OrderManager.Core;
 using OrderManager.Data;
 using OrderManager.Models;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OrderManager.Controllers
 {
@@ -25,6 +26,13 @@ namespace OrderManager.Controllers
             return Ok(await _unitOfWork.Orders.All());
         }
 
+        [HttpGet]
+        [Route("id")]
+        public async Task<IActionResult> GetOrder([FromQuery] string id)
+        {
+            return Ok(await _unitOfWork.Orders.GetById(Guid.Parse(id)));
+        }
+
         [HttpPost]
         [Route("create")]
         public  async Task<IActionResult> CreateOrder(Order order)
@@ -36,12 +44,16 @@ namespace OrderManager.Controllers
 
         [HttpDelete]
         [Route("delete")]
-        public async Task<IActionResult> DeleteOrder(Guid id)
+        public async Task<IActionResult> DeleteOrders([FromQuery] string ids)
         {
-            var order = await _unitOfWork.Orders.GetById(id);
-            if (order == null) return NotFound();
-            
-            await  _unitOfWork.Orders.Delete(order);
+            if (string.IsNullOrEmpty(ids)) return BadRequest();
+
+            var idList = ids.Split(',').Select(id => Guid.Parse(id)).ToArray();
+            var orders = await _unitOfWork.Orders.GetAllByIds(idList);
+
+            if (orders == null || orders.Count == 0) return NotFound();
+
+            _unitOfWork.Orders.DeleteRange(orders);
             await _unitOfWork.CompleteAsync();
 
             return NoContent();
@@ -55,13 +67,13 @@ namespace OrderManager.Controllers
             if (existingOrder == null) return NotFound();
             await _unitOfWork.Orders.Update(order);
             await _unitOfWork.CompleteAsync();
-
-            return Ok();
+            var upDatedOrder = await _unitOfWork.Orders.GetById(order.Id);
+            return Ok(upDatedOrder);
         }
 
         [HttpGet]
         [Route("OrderType")]
-        public async Task<IActionResult> GetOrderByType(string type)
+        public async Task<IActionResult> GetOrderByType([FromQuery] string type)
         {
             if (string.IsNullOrEmpty(type)) throw new ArgumentNullException("The vlaue passed cannot be null or empty");
 

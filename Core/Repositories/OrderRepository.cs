@@ -23,6 +23,12 @@ namespace OrderManager.Core.Repositories
             }
         }
 
+        public async Task<List<Order>> GetAllByIds(Guid[] ids)
+        {
+            var orders = await _context.Orders.Where(o => ids.Contains(o.Id)).ToListAsync();
+            return orders;
+        }
+
         public async Task<List<Order>> GetByOrderType(string type)
         {
             try
@@ -37,6 +43,11 @@ namespace OrderManager.Core.Repositories
 
                 throw;
             }
+        }
+
+        public void DeleteRange(IEnumerable<Order> orders)
+        {
+            _context.Orders.RemoveRange(orders);
         }
     }
 }

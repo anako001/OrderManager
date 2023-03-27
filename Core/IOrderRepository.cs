@@ -6,5 +6,7 @@ namespace OrderManager.Core
     {
         Task<List<Order>> GetByOrderType(string type);
         Task<Order> GetById(Guid id);
+        Task<List<Order>> GetAllByIds(Guid[] ids);
+        void DeleteRange(IEnumerable<Order> orders);
     }
 }
