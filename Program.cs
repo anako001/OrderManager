@@ -17,7 +17,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContextPool<ApiDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDataBase")));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDataBase"));
+
+});
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddCors();
